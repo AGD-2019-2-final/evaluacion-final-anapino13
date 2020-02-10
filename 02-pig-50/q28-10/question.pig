@@ -30,3 +30,10 @@ u = LOAD 'data.csv' USING PigStorage(',')
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
 
+dato1 = FOREACH u GENERATE
+        ToString(ToDate(birthday, 'yyyy-MM-dd'),'yyyy'),
+        ToString(ToDate(birthday, 'yyyy-MM-dd'),'yy');
+
+STORE dato1 INTO 'output' USING PigStorage(','); 
+    
+fs -copyToLocal output

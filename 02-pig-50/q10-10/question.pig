@@ -26,3 +26,28 @@ u = LOAD 'data.csv' USING PigStorage(',')
 --
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
+
+fs -rm output/*
+fs -rmdir  output
+fs -rm -f -r data.csv
+fs -put data.csv
+
+dato = LOAD 'data.csv' USING PigStorage(',') 
+    AS (id:int, 
+        firstname:CHARARRAY, 
+        surname:CHARARRAY, 
+        birthday:CHARARRAY, 
+        color:CHARARRAY, 
+        quantity:INT);
+
+
+dato1 = FOREACH dato GENERATE $2,SIZE($2);
+dato2= ORDER dato1 BY $1 DESC, $0;
+dato3 = LIMIT dato2 5;
+final = FOREACH dato3 GENERATE CONCAT($0,',',(CHARARRAY)$1);
+DUMP final;
+
+
+STORE final INTO 'output';
+
+fs -copyToLocal output outpu

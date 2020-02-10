@@ -27,3 +27,24 @@ u = LOAD 'data.csv' USING PigStorage(',')
 --
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
+
+fs -rm output/*
+fs -rmdir  output
+fs -rm -f -r data.csv
+fs -put data.csv
+
+u = LOAD 'data.csv' USING PigStorage(',') 
+    AS (id:int, 
+        firstname:CHARARRAY, 
+        surname:CHARARRAY, 
+        birthday:CHARARRAY, 
+        color:CHARARRAY, 
+        quantity:INT);
+
+dato = FOREACH u GENERATE firstname,color;
+
+dato2 = FILTER dato BY color == 'blue' and STARTSWITH(firstname,'Z');
+
+store dato2 into 'output' USING PigStorage(' ');
+
+fs -copyToLocal output

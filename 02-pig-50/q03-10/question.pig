@@ -8,3 +8,19 @@ fs -rm -f -r output;
 --
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
+
+fs -rm output/*
+fs -rmdir  output
+fs -rm -f -r data.tsv
+fs -put data.tsv
+
+u = LOAD 'data.tsv'
+    AS (f1:CHARARRAY, f2:CHARARRAY, f3:INT);
+final = FOREACH u GENERATE f3;
+orden2 = ORDER final BY $0;
+limite = LIMIT orden2 5;
+DUMP limite;  
+
+STORE limite INTO 'output';
+
+fs -copyToLocal output

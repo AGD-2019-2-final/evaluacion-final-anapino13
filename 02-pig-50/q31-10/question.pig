@@ -20,3 +20,9 @@ u = LOAD 'data.csv' USING PigStorage(',')
 --
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
+dato1 = foreach u generate SUBSTRING(birthday,0,4) as ano;
+dato2 = group dato1 by ano;
+dato3 = foreach dato2 generate group,   COUNT(dato1);
+store dato3 into 'output' USING PigStorage(',');
+    
+fs -copyToLocal output

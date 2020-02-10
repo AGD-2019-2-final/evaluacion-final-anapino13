@@ -27,3 +27,8 @@ u = LOAD 'data.csv' USING PigStorage(',')
 --
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
+dato1 = FOREACH u GENERATE firstname as firstname;
+datos2 = FILTER dato1 BY (firstname matches '[M-Z].*');
+STORE datos2 INTO './output' using PigStorage(',');
+
+fs -copyToLocal output

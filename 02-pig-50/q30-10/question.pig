@@ -41,3 +41,42 @@ u = LOAD 'data.csv' USING PigStorage(',')
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
 
+fecha = FOREACH u GENERATE birthday as fecha, ToDate(birthday,'yyyy-MM-dd') AS fecha_formato;
+
+formato = FOREACH fecha GENERATE fecha
+                , SUBSTRING($0,8,10) AS num_dia_largo
+                , GetDay(fecha_formato) as num_dia
+                , ToString(ToDate(fecha,'yyyy-MM-dd'), 'EEE') AS fecha_corta
+                , ToString(ToDate(fecha,'yyyy-MM-dd'), 'EEEE') AS fecha_larga
+                ;
+
+
+
+final = FOREACH formato GENERATE fecha
+                , num_dia_largo
+                , num_dia
+                , case fecha_corta
+                    when 'Mon' then 'lun'
+                    when 'Tue' then 'mar'
+                    when 'Wed' then 'mie'
+                    when 'Thu' then 'jue'
+                    when 'Fri' then 'vie'
+                    when 'Sat' then 'sab'
+                    when 'Sun' then 'dom'
+                    end as nom_dia_corto
+
+                , case fecha_corta
+                    when 'Mon' then 'lunes'
+                    when 'Tue' then 'martes'
+                    when 'Wed' then 'miercoles'
+                    when 'Thu' then 'jueves'
+                    when 'Fri' then 'viernes'
+                    when 'Sat' then 'sabado'
+                    when 'Sun' then 'domingo'
+                    end as nom_dia_largo;
+
+
+
+store final into 'output' USING PigStorage(',');
+
+fs -copyToLocal output
